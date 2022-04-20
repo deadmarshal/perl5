@@ -746,6 +746,40 @@ Unsets the PV status of an SV.
 Tells an SV that it is a string and disables all other C<OK> bits.
 Will also turn off the UTF-8 status.
 
+=for apidoc Am|U32|SvPIOK|SV* sv
+Returns a bool indicating whether the SV is both C<SvPOK()> and
+C<SvIOK()> at the same time. Equivalent to C<SvIOK(sv) && SvPOK(sv)> but
+more efficient.
+
+=for apidoc Am|void|SvPIOK_on|SV* sv
+Tells an SV that is a string and a number in one operation. Equivalent
+to C<SvIOK_on(sv); SvPOK_on(sv);> but more efficient.
+
+=for apidoc Am|void|SvPIOK_off|SV* sv
+Unsets the PV and IV status of an SV in one operation. Equivalent to
+C<SvIOK_off(sv); SvPK_off(v);> but more efficient.
+
+=for apidoc Am|bool|PIOK_sv_isbool|SV* sv
+Checks if a PIOK sv is a bool. Note that it is the callers
+responsibility to ensure that the sv is SvPIOK. This macro is only
+useful in specialized logic where the flags have already been checked to
+be correct. Almost always you should be using the function
+C<sv_isbool(sv)> instead.
+
+=for apidoc Am|bool|PIOK_sv_isbool_true|SV* sv
+Checks if a PIOK sv is a true bool. Note that it is the callers
+responsibility to ensure that the sv is SvPIOK. This macro is only
+useful in specialized logic where the flags have already been checked to
+be correct. This is NOT what you should use to check if an SV is "true",
+for that you should be using the function C<SvTRUE(sv)> instead.
+
+=for apidoc Am|bool|PIOK_sv_isbool_false|SV* sv
+Checks if a PIOK sv is a false bool. Note that it is the callers
+responsibility to ensure that the sv is SvPIOK. This macro is only
+useful in specialized logic where the flags have already been checked to
+be correct. This is NOT what you should use to check if an SV is "false",
+for that you should be using the expression C<!SvTRUE(sv)> instead.
+
 =for apidoc Am|bool|SvVOK|SV* sv
 Returns a boolean indicating whether the SV contains a v-string.
 
@@ -913,6 +947,18 @@ Set the size of the string buffer for the SV. See C<L</SvLEN>>.
 #define SvUOK(sv)		SvIOK_UV(sv)
 #define SvIOK_notUV(sv)		((SvFLAGS(sv) & (SVf_IOK|SVf_IVisUV))	\
                                  == SVf_IOK)
+
+#define SvPIOK(sv)              ((SvFLAGS(sv) & (SVf_IOK|SVf_POK)) == (SVf_IOK|SVf_POK))
+#define SvPIOK_on(sv)           (assert_not_glob(sv) \
+                                    (SvFLAGS(sv) |= (SVf_IOK|SVp_IOK|SVf_POK|SVp_POK)))
+#define SvPIOK_off(sv)          (SvFLAGS(sv) &= ~(SVf_IOK|SVp_IOK|SVf_IVisUV|SVf_POK|SVp_POK))
+
+#define PIOK_sv_isbool(sv)      (SvIsCOW_static(sv) && \
+        (SvPVX_const(sv) == PL_Yes || SvPVX_const(sv) == PL_No))
+#define PIOK_sv_isbool_true(sv)      (SvIsCOW_static(sv) && \
+        (SvPVX_const(sv) == PL_Yes))
+#define PIOK_sv_isbool_false(sv)      (SvIsCOW_static(sv) && \
+        (SvPVX_const(sv) == PL_No))
 
 #define SvIsUV(sv)		(SvFLAGS(sv) & SVf_IVisUV)
 #define SvIsUV_on(sv)		(SvFLAGS(sv) |= SVf_IVisUV)
