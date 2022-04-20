@@ -1453,14 +1453,14 @@ my_ck_rv2cv(pTHX_ OP *o)
     return old_ck_rv2cv(aTHX_ o);
 }
 
-#define test_bool_internals_macro(true_sv,false_sv) \
-    test_bool_internals_func(true_sv,false_sv,\
+#define test_bool_internals_macro(true_sv, false_sv) \
+    test_bool_internals_func(true_sv, false_sv,\
         #true_sv " and " #false_sv)
 
 U32
 test_bool_internals_func(SV *true_sv, SV *false_sv, const char *msg) {
-    U32 failed= 0;
-    printf("# Testing '%s'\n",msg);
+    U32 failed = 0;
+    printf("# Testing '%s'\n", msg);
     TEST_EXPR(SvCUR(true_sv) == 1);
     TEST_EXPR(SvCUR(false_sv) == 0);
     TEST_EXPR(SvLEN(true_sv) == 0);
@@ -1475,26 +1475,26 @@ test_bool_internals_func(SV *true_sv, SV *false_sv, const char *msg) {
     TEST_EXPR(SvIOK(false_sv));
     TEST_EXPR(SvPOK(true_sv));
     TEST_EXPR(SvPOK(false_sv));
-    TEST_EXPR(SvPIOK(true_sv));
-    TEST_EXPR(SvPIOK(false_sv));
+    TEST_EXPR(SvBoolFlagsOK(true_sv));
+    TEST_EXPR(SvBoolFlagsOK(false_sv));
     TEST_EXPR(SvTYPE(true_sv) >= SVt_PVNV);
     TEST_EXPR(SvTYPE(false_sv) >= SVt_PVNV);
-    TEST_EXPR(SvPIOK(true_sv) && PIOK_sv_isbool(true_sv));
-    TEST_EXPR(SvPIOK(false_sv) && PIOK_sv_isbool(false_sv));
-    TEST_EXPR(SvPIOK(true_sv) && PIOK_sv_isbool_true(true_sv));
-    TEST_EXPR(SvPIOK(false_sv) && PIOK_sv_isbool_false(false_sv));
-    TEST_EXPR(SvPIOK(true_sv) && !PIOK_sv_isbool_false(true_sv));
-    TEST_EXPR(SvPIOK(false_sv) && !PIOK_sv_isbool_true(false_sv));
+    TEST_EXPR(SvBoolFlagsOK(true_sv) && BOOL_INTERNALS_sv_isbool(true_sv));
+    TEST_EXPR(SvBoolFlagsOK(false_sv) && BOOL_INTERNALS_sv_isbool(false_sv));
+    TEST_EXPR(SvBoolFlagsOK(true_sv) && BOOL_INTERNALS_sv_isbool_true(true_sv));
+    TEST_EXPR(SvBoolFlagsOK(false_sv) && BOOL_INTERNALS_sv_isbool_false(false_sv));
+    TEST_EXPR(SvBoolFlagsOK(true_sv) && !BOOL_INTERNALS_sv_isbool_false(true_sv));
+    TEST_EXPR(SvBoolFlagsOK(false_sv) && !BOOL_INTERNALS_sv_isbool_true(false_sv));
     TEST_EXPR(SvTRUE(true_sv));
     TEST_EXPR(!SvTRUE(false_sv));
     if (failed) {
-        PerlIO_printf(Perl_debug_log,"# '%s' the tested true_sv:\n", msg);
+        PerlIO_printf(Perl_debug_log, "# '%s' the tested true_sv:\n", msg);
         sv_dump(true_sv);
-        PerlIO_printf(Perl_debug_log,"# PL_sv_yes:\n");
+        PerlIO_printf(Perl_debug_log, "# PL_sv_yes:\n");
         sv_dump(&PL_sv_yes);
-        PerlIO_printf(Perl_debug_log,"# '%s' tested false_sv:\n",msg);
+        PerlIO_printf(Perl_debug_log, "# '%s' tested false_sv:\n",msg);
         sv_dump(false_sv);
-        PerlIO_printf(Perl_debug_log,"# PL_sv_no:\n");
+        PerlIO_printf(Perl_debug_log, "# PL_sv_no:\n");
         sv_dump(&PL_sv_no);
     }
     SvREFCNT_dec(true_sv);
@@ -7726,30 +7726,32 @@ test_bool_internals()
     CODE:
     {
         U32 failed = 0;
-        SV *true_sv_setsv= newSV(0);
-        SV *false_sv_setsv= newSV(0);
-        SV *true_sv_set_true= newSV(0);
-        SV *false_sv_set_false= newSV(0);
-        SV *true_sv_set_bool= newSV(0);
-        SV *false_sv_set_bool= newSV(0);
-        SV *sviv= newSViv(1);
-        SV *svpv= newSVpvs("whatever");
-        TEST_EXPR(SvIOK(sviv) && !SvPIOK(sviv));
-        TEST_EXPR(SvPOK(svpv) && !SvPIOK(svpv));
-        sv_setsv(true_sv_setsv,&PL_sv_yes);
-        sv_setsv(false_sv_setsv,&PL_sv_no);
+        SV *true_sv_setsv = newSV(0);
+        SV *false_sv_setsv = newSV(0);
+        SV *true_sv_set_true = newSV(0);
+        SV *false_sv_set_false = newSV(0);
+        SV *true_sv_set_bool = newSV(0);
+        SV *false_sv_set_bool = newSV(0);
+        SV *sviv = newSViv(1);
+        SV *svpv = newSVpvs("whatever");
+        TEST_EXPR(SvIOK(sviv) && !SvIandPOK(sviv));
+        TEST_EXPR(SvPOK(svpv) && !SvIandPOK(svpv));
+        TEST_EXPR(SvIOK(sviv) && !SvBoolFlagsOK(sviv));
+        TEST_EXPR(SvPOK(svpv) && !SvBoolFlagsOK(svpv));
+        sv_setsv(true_sv_setsv, &PL_sv_yes);
+        sv_setsv(false_sv_setsv, &PL_sv_no);
         sv_set_true(true_sv_set_true);
         sv_set_false(false_sv_set_false);
-        sv_set_bool(true_sv_set_bool,true);
-        sv_set_bool(false_sv_set_bool,false);
+        sv_set_bool(true_sv_set_bool, true);
+        sv_set_bool(false_sv_set_bool, false);
         /* note that test_bool_internals_macro() SvREFCNT_dec's its arguments
          * after the tests */
-        failed += test_bool_internals_macro(newSVsv(&PL_sv_yes),newSVsv(&PL_sv_no));
-        failed += test_bool_internals_macro(newSV_true(),newSV_false());
-        failed += test_bool_internals_macro(newSVbool(1),newSVbool(0));
-        failed += test_bool_internals_macro(true_sv_setsv,false_sv_setsv);
-        failed += test_bool_internals_macro(true_sv_set_true,false_sv_set_false);
-        failed += test_bool_internals_macro(true_sv_set_bool,false_sv_set_bool);
+        failed += test_bool_internals_macro(newSVsv(&PL_sv_yes), newSVsv(&PL_sv_no));
+        failed += test_bool_internals_macro(newSV_true(), newSV_false());
+        failed += test_bool_internals_macro(newSVbool(1), newSVbool(0));
+        failed += test_bool_internals_macro(true_sv_setsv, false_sv_setsv);
+        failed += test_bool_internals_macro(true_sv_set_true, false_sv_set_false);
+        failed += test_bool_internals_macro(true_sv_set_bool, false_sv_set_bool);
         SvREFCNT_dec(sviv);
         SvREFCNT_dec(svpv);
         RETVAL = failed;

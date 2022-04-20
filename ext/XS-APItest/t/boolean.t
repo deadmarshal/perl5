@@ -44,7 +44,7 @@ use XS::APItest;
 }
 
 
-is(test_bool_internals(),0,"Bulk test internal bool related APIs");
+is(test_bool_internals(), 0, "Bulk test internal bool related APIs");
 
 
 done_testing;

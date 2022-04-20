@@ -4705,8 +4705,8 @@ Perl_sv_set_false(pTHX_ SV *sv)
 /*
 =for apidoc sv_set_bool
 
-Equivalent to C<sv_setsv(sv, &PL_sv_no)>, but may be made more
-efficient in the future. Doesn't handle set magic.
+Equivalent to C<sv_setsv(sv, bool_val ? &Pl_sv_yes : &PL_sv_no)>, but
+may be made more efficient in the future. Doesn't handle set magic.
 
 The perl equivalent is C<$sv = !!$expr;>.
 

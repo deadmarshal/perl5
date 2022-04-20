@@ -3451,7 +3451,7 @@ Perl_mortal_getenv(const char * str)
 PERL_STATIC_INLINE bool
 Perl_sv_isbool(pTHX_ const SV *sv)
 {
-    return SvPIOK(sv) && PIOK_sv_isbool(sv);
+    return SvBoolFlagsOK(sv) && BOOL_INTERNALS_sv_isbool(sv);
 }
 
 #ifdef USE_ITHREADS
