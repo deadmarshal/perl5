@@ -7721,6 +7721,10 @@ test_siphash13()
     OUTPUT:
         RETVAL
 
+#endif
+
+MODULE = XS::APItest            PACKAGE = XS::APItest::BoolInternals
+
 UV
 test_bool_internals()
     CODE:
@@ -7759,4 +7763,3 @@ test_bool_internals()
     OUTPUT:
         RETVAL
 
-#endif
