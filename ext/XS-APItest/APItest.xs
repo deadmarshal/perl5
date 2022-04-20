@@ -7721,7 +7721,7 @@ test_siphash13()
     OUTPUT:
         RETVAL
 
-#endif
+#endif /* END 64 BIT SIPHASH TESTS */
 
 MODULE = XS::APItest            PACKAGE = XS::APItest::BoolInternals
 
